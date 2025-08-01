@@ -34,7 +34,7 @@ export const verifyToken = (role = "user") => {
           });
 
           if(role === "admin"){
-            await userRepository.find(decoded._id)
+            await userRepository.findAdminWithId(decoded._id)
           }else{
             await userRepository.findUserById(decoded._id);
           }

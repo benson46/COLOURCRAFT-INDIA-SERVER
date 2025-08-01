@@ -16,10 +16,7 @@ import { tokenCreation } from "../../utils/jwt.js";
  * @desc    Handles temp storage, verify otp, regiester, and login user
  */
 export const authServices = {
-  /**
-   * @function   initiatingRegister
-   * @desc       Stores user detials for temperory before sending otp
-   */
+  // Inital register before otp verification
   initiatingRegister: async (name, email, password) => {
     try {
       // Input Validations
@@ -54,7 +51,9 @@ export const authServices = {
       // Checking For Duplicate user
       const existingUser = await userRepository.findUserByEmail(email);
       if (existingUser) {
-        const error = createError.Conflict("User already exist with this email");
+        const error = createError.Conflict(
+          "User already exist with this email"
+        );
         error.details = {
           suggestion: "try login or reset your password.",
           errType: "DUPLICATE_USER",
@@ -64,7 +63,8 @@ export const authServices = {
 
       // Check Existing User In OTP Database
       const existingOtpUser = await OTPRepository.findUserByEmail(email);
-      if (existingOtpUser && existingOtpUser.resendCount >= 4) {  // user can only send 4 otp per 24 hours
+      if (existingOtpUser && existingOtpUser.resendCount >= 4) {
+        // user can only send 4 otp per 24 hours
         const error = createError.TooManyRequests("Limit of resend occurs");
         error.details = {
           suggestion: "Try again after 24 hours",
@@ -75,7 +75,9 @@ export const authServices = {
 
       // Hashing Password Securely
       const hashPassword = await argon2.hash(password);
-      const resendOtpCount = existingOtpUser? existingOtpUser.resendCount + 1: 1;
+      const resendOtpCount = existingOtpUser
+        ? existingOtpUser.resendCount + 1
+        : 1;
 
       // OTP Generating and Hashing
       const OtpForUser = generateOtp();
@@ -99,10 +101,7 @@ export const authServices = {
     }
   },
 
-  /**
-   * @function   verifyUserOtp
-   * @desc       Verify otp with otp in database
-   */
+  // Verify otp with otp in database
   verifyUserOtp: async (email, otp) => {
     try {
       const hashed = hashOtp(otp);
@@ -121,10 +120,7 @@ export const authServices = {
     }
   },
 
-  /**
-   * @function  registerUser
-   * @desc      Create user after verifing otp
-   */
+  // Create user after verifing otp
   registerUser: async (email) => {
     try {
       const { name, password, createdAt } = await OTPRepository.findUserByEmail(
@@ -137,7 +133,7 @@ export const authServices = {
         password,
         createdAt
       );
-      await OTPRepository.deleteVerifieduser(email); // delete from initial schema
+      await OTPRepository.deleteVerifieduser(email); // delete from OTP schema
 
       return { name: newUser.name, email: newUser.email };
     } catch (err) {
@@ -146,10 +142,7 @@ export const authServices = {
     }
   },
 
-  /**
-   * @function    loginUser
-   * @desc        Login user
-   */
+  //  Login user
   loginUser: async (email, password) => {
     try {
       // Basic validation
@@ -177,7 +170,10 @@ export const authServices = {
       }
 
       // Decoding password and validation
-      const verifyPassword = await argon2.verify(existingUser.password,password);
+      const verifyPassword = await argon2.verify(
+        existingUser.password,
+        password
+      );
 
       if (!verifyPassword) {
         const error = createError.Unauthorized("Invalid email or password");

@@ -2,6 +2,7 @@ import Product from "../model/productModel.js";
 import createError from "../utils/createError.js";
 
 export const productRepository = {
+  // Find product by title
   findByTitle: async (title) => {
     try {
       return await Product.findOne({ title });
@@ -11,6 +12,8 @@ export const productRepository = {
       );
     }
   },
+
+  // Find product by Id
   findById: async (_id) => {
     try {
       return await Product.findById(_id);
@@ -18,6 +21,8 @@ export const productRepository = {
       throw createError.Internal("Database error while fetching product");
     }
   },
+
+  // Create new product
   newProduct: async (data) => {
     try {
       const product = new Product({
@@ -37,6 +42,8 @@ export const productRepository = {
       );
     }
   },
+
+  // Find all Products 
   findAllProducts: async () => {
     try {
       return await Product.find().populate('category');
@@ -44,6 +51,8 @@ export const productRepository = {
       throw createError.Internal("Database error while fetching products");
     }
   },
+
+  // Toogle product status block/unblock
   toogleStatusProduct: async (product) => {
     try {
       console.log("heyya", product);
@@ -62,6 +71,8 @@ export const productRepository = {
       );
     }
   },
+
+  // Edit product 
   updateProduct: async (id, updateData) => {
   try {
     return await Product.findByIdAndUpdate(

@@ -6,16 +6,16 @@ import { adminTokenCreation } from "../../utils/jwt.js";
 
 /**
  * ADMIN AUTH SERVICES
- * @desc Handles admin authentication, including login and token generation
+ * @desc Handles admin authentication including login and token generation
  */
 export const adminAuthServices = {
-  /**
+  /** Login Admin
    * @function loginAdmin
    * @desc    Validates credentials, authenticates admin, and issues tokens
    */
   loginAdmin: async (email, password) => {
     try {
-      // Basic input validation
+      // 1. Basic input validation
       if (!isValidEmail(email) || !isValidPassword(password)) {
         const error = createError.BadRequest("Invalid email or password");
         error.details = {
@@ -25,7 +25,7 @@ export const adminAuthServices = {
         throw error;
       }
 
-      // Fetch admin by email
+      // 2. Fetch admin by email
       const admin = await userRepository.findAdminWithEmail(email);
       if (!admin) {
         const error = createError.BadRequest("Invalid email or password");
@@ -36,7 +36,7 @@ export const adminAuthServices = {
         throw error;
       }
 
-      // Verify password
+      // 3. Verify password
       const verifyPassword = await argon2.verify(admin.password, password);
       if (!verifyPassword) {
         const error = createError.BadRequest("Invalid email or password");
@@ -47,7 +47,7 @@ export const adminAuthServices = {
         throw error;
       }
 
-      // Generate JWT tokens
+      // 4. Generate JWT tokens
       const { getAdminAccessToken, getAdminRefreshToken } = adminTokenCreation(admin);
       const adminAccessToken = getAdminAccessToken();
       const adminRefreshToken = getAdminRefreshToken();

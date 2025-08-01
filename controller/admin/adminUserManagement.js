@@ -7,10 +7,8 @@ import { adminUserServices } from "../../services/admin/adminUserServices.js";
  */
 
 export const adminUserMangement = {
-
-  /**
-   * @function  fetchUsers
-   * @desc      Fetch all registered users
+  /** Fetch Users
+   *  @desc      Fetch all registered users
    */
   fetchUsers: async (req, res, next) => {
     try {
@@ -25,9 +23,8 @@ export const adminUserMangement = {
     }
   },
 
-  /**
-   * @function  tooglingUser
-   * @desc      Block or Unblock user
+  /** Toogle User Status
+   *  @desc      Toogle Block/Unblock user
    */
   tooglingUser: async (req, res, next) => {
     try {

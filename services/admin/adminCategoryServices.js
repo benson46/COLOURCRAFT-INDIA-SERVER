@@ -7,10 +7,7 @@ import { isValidTitle } from "../../utils/validators.js";
  * @desc    Handles fetching, adding, status toggling, and editing of categories
  */
 export const adminCategoryServices = {
-  /**
-   * @function getAllCategory
-   * @desc     Fetch all categories
-   */
+//  Fetch all categories
   getAllCategory: async () => {
     try {
       return await categoryRepository.findAllCategory();
@@ -19,10 +16,7 @@ export const adminCategoryServices = {
     }
   },
 
-  /**
-   * @function addNewCategory
-   * @desc     Add a new category to the database
-   */
+  // Add new category
   addNewCategory: async (title, status) => {
     try {
       // Basic  validation
@@ -48,10 +42,7 @@ export const adminCategoryServices = {
     }
   },
 
-  /**
-   * @function updateCategoryStatus
-   * @desc     Toggle the status (block/unblock) of a category
-   */
+  // Toogle category status block/unblock
   updateCategoryStatus: async (_id, status) => {
     try {
       return await categoryRepository.updateStatus(_id, status);
@@ -60,10 +51,7 @@ export const adminCategoryServices = {
     }
   },
 
-  /**
-   * @function editCategory
-   * @desc     Rename the category title
-   */
+  // Update category data
   editCategory: async (_id, title) => {
     try {
       // Basic validation

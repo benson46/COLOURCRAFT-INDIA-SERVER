@@ -11,29 +11,26 @@ import { validateProduct } from "../../utils/validators.js";
  * @access  Private
  */
 export const adminProductController = {
-
-  /**
-   * @function addingNewProduct
-   * @route    POST /api/admin/product
-   * @desc
-   */
+  // Add new product
   addingNewProduct: async (req, res, next) => {
     try {
       const imageUrls = [];
+      // 1. Upload image to cloudinary 
       if (req.files && req.files.length > 0) {
         for (const file of req.files) {
           const result = await cloudinary.uploader.upload(file.path, {
             folder: "admin-products",
           });
           imageUrls.push(result.secure_url);
+          // 2. Delete uploaded file from local 
           fs.unlinkSync(file.path);
         }
       }
 
-      // Add image URLs to request body
+      // 3. Add image URLs to request body
       req.body.images = imageUrls;
 
-      // Now validate (includes image validation)
+      // Validate product
       const validatingProduct = validateProduct(req.body);
       if (!validatingProduct.isValid) {
         throw createError.BadRequest(
@@ -42,47 +39,44 @@ export const adminProductController = {
         );
       }
 
-      // Create product
-      const response = await adminProductServices.addNewProduct(req.body);
+      const product = await adminProductServices.addNewProduct(req.body);
       return res.status(201).json({
         success: true,
         message: "Product added successfully",
-        response,
+        product,
       });
     } catch (error) {
       console.error("Product addition error:", error);
       next(error);
     }
   },
+
+  // Fetch products
   fetchingProducts: async (req, res, next) => {
     try {
       const products = await adminProductServices.fetchProducts();
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Product fetch successfuly",
-          products,
-        });
+      return res.status(200).json({
+        success: true, message: "Product fetch successfuly", products
+      });
     } catch (error) {
       next(error);
     }
   },
+
+  // Toogle block or unblock product
   tooglingStatus: async (req, res, next) => {
     try {
       const product = await adminProductServices.toogleStatus(req.params.id);
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Update product status success",
-          product,
+      return res.status(200).json({
+          success: true,message: "Update product status success", product,
         });
     } catch (error) {
       next(error);
     }
   },
+
+  // Update product
   editingProduct: async (req, res, next) => {
   try {
     // Parse images field ALWAYS
@@ -145,7 +139,6 @@ export const adminProductController = {
       );
     }
 
-    // Update product
     const editedProduct = await adminProductServices.editProduct(productData);
     return res.status(200).json({
       success: true,

@@ -8,11 +8,9 @@ import createError from "../../utils/createError.js";
  * @access Public
  */
 export const authController = {
-  /**
-   * @function initiateRegister
-   * @route   POST /api/user/initiate-register
+
+  /** inital register
    * @desc    Validates input and sends OTP to user's email
-   * @access  Public
    */
   initiateRegister: async (req, res, next) => {
     try {
@@ -43,11 +41,9 @@ export const authController = {
     }
   },
 
-  /**
-   * @function verifyOtp
-   * @route   POST /api/user/verify-otp
+
+  /** Verify OTP
    * @desc    Verifies the OTP and registers the user
-   * @access  Public
    */
   verifyOtp: async (req, res, next) => {
     try {
@@ -68,11 +64,9 @@ export const authController = {
     }
   },
 
-  /**
-   * @function login
-   * @route   POST /api/user/login
-   * @desc    Logs in the user and sets HTTP-only access/refresh tokens
-   * @access  Public
+  
+  /** Login User
+   * @desc    Logs in the user and sets HTTP-Only access/refresh tokens
    */
   login: async (req, res, next) => {
     try {

@@ -1,4 +1,6 @@
-// @access PRIVATE
+/**
+ * @access PRIVATE
+ *  */ 
 import express from "express";
 
 import { adminAuthController } from "../controller/admin/adminAuthController.js";

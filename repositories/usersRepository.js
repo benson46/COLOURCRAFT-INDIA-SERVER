@@ -3,9 +3,7 @@ import createError from "../utils/createError.js";
 
 // Repository for handling user database
 export const userRepository = {
-  /**
-   * Find user by id
-   */
+  // Find user by Id (-password)
   findUserById: async (id) => {
     try {
       return await User.findById(id).select("-password");
@@ -15,9 +13,7 @@ export const userRepository = {
     }
   },
 
-  /**
-   * Find user by email(-password)
-   */
+  // Find user by email(-password)
   findUserByEmail: async (email) => {
     try {
       return await User.findOne({ email }).select("-password");
@@ -27,9 +23,7 @@ export const userRepository = {
     }
   },
 
-  /**
-   * Find user by email (+password)
-   */
+  // Find user by email (+password)
   findUserByEmailWithPassword: async (email) => {
     try {
       return await User.findOne({ email }).select("+password");
@@ -39,21 +33,17 @@ export const userRepository = {
     }
   },
 
-  /**
-   * Create the new user 
-   */
+  // Create new user
   createUser: async (name, email, password, createdAt) => {
     try {
-      return await  User.create({ name, email, password, createdAt });
+      return await User.create({ name, email, password, createdAt });
     } catch (error) {
       console.error("Error creating new user userRepository: ", error);
       throw createError.Internal("Database error while creating new user");
     }
   },
 
-  /**
-   * Find admin with email
-   */
+  // Find admin with email
   findAdminWithEmail: async (email) => {
     try {
       const admin = await User.findOne({ email });
@@ -61,7 +51,8 @@ export const userRepository = {
       if (!admin || admin.role !== "admin") {
         const error = createError.Unauthorized("Invalid email or password");
         error.details = {
-          suggestion: "Try Contact Technical Support in case of forgotten credentials",
+          suggestion:
+            "Try Contact Technical Support in case of forgotten credentials",
           errType: "INVALID_CREDENTIALS",
         };
         throw error;
@@ -77,24 +68,23 @@ export const userRepository = {
     }
   },
 
-  /**
-   * Find admin with id
-   */
-  findAdminWithId:async(_id)=>{
+  // Find admin with id
+  findAdminWithId: async (_id) => {
     try {
-     const admin =  await User.findById(_id).select("-password")
-     if(admin.role !== "admin"){
-      const error = createError.Unauthorized("Invalid Admin")
-      throw error
-     }
+      const admin = await User.findById(_id).select("-password");
+      if (admin.role !== "admin") {
+        const error = createError.Unauthorized("Invalid Admin");
+        throw error;
+      }
     } catch (error) {
-      throw createError.Internal("Error while fetching admin userRepository: ",error)
+      throw createError.Internal(
+        "Error while fetching admin userRepository: ",
+        error
+      );
     }
   },
 
-  /**
-   * Find all users for admin only
-   */
+  // Find all users (admin only)
   findAllUserForAdmin: async () => {
     try {
       return await User.find().select("-password");

@@ -52,7 +52,6 @@ export const adminCategoryController = {
    * @function tooglingCategory
    * @route   PATCH /api/admin/category-tootgle-status/:_id
    * @desc    Toggle the status (block/unblock) of a category
-   * @access  Private
    */
   tooglingCategory: async (req, res, next) => {
     try {
@@ -78,7 +77,6 @@ export const adminCategoryController = {
    * @function editingCategory
    * @route   PATCH /api/admin/category/:id
    * @desc    Edit the title of a category
-   * @access  Private
    */
   editingCategory: async (req, res, next) => {
     try {

@@ -7,10 +7,7 @@ import { isValidEmail } from "../../utils/validators.js";
  * @desc    Handles fetching and status toogling of users
  */
 export const adminUserServices = {
-  /**
-   * @function findAllCategory
-   * @desc     Fetch all users
-   */
+  // Fetch all users
   findAllUser: async () => {
     try {
       const users = await userRepository.findAllUserForAdmin();
@@ -18,15 +15,12 @@ export const adminUserServices = {
     } catch (error) {}
   },
 
-  /**
-   * @function  toogleUser
-   * @desc      Update user status
-   */
+  // Toogle user status block/unblock
   toogleUser: async (email) => {
     try {
       const validEmail = isValidEmail(email);
-      if(!validEmail){
-        throw createError.BadRequest('Invalid Email')
+      if (!validEmail) {
+        throw createError.BadRequest("Invalid Email");
       }
       const user = await userRepository.findUserByEmail(email);
       user.status = user.status === "Active" ? "Blocked" : "Active";
