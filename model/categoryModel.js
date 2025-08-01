@@ -6,14 +6,11 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isBlocked: {
-      type: Boolean,
-      default: false,
-    },status:{
-        type: String,
-        default:"Active",
-        enum:["Active","Inactive"]
-    }
+    status: {
+      type: String,
+      default: "Active",
+      enum: ["Active", "Inactive"],
+    },
   },
   {
     timestamps: true,

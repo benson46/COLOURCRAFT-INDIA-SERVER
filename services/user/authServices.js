@@ -9,12 +9,20 @@ import { userRepository } from "../../repositories/usersRepository.js";
 import { OTPRepository } from "../../repositories/otpRepository.js";
 import { generateOtp, hashOtp } from "../../utils/otpGeneration.js";
 import { sendOtpMail } from "../../utils/sendOtpMail.js";
-import {tokenCreation} from "../../utils/jwt.js"
+import { tokenCreation } from "../../utils/jwt.js";
 
+/**
+ * USER AUTH SERVICES
+ * @desc    Handles temp storage, verify otp, regiester, and login user
+ */
 export const authServices = {
+  /**
+   * @function   initiatingRegister
+   * @desc       Stores user detials for temperory before sending otp
+   */
   initiatingRegister: async (name, email, password) => {
     try {
-      // Input Validation
+      // Input Validations
       if (!isValidName(name)) {
         const error = createError.BadRequest("Invalid name");
         error.details = {
@@ -43,12 +51,10 @@ export const authServices = {
         throw error;
       }
 
-      // Checking For Existing user
+      // Checking For Duplicate user
       const existingUser = await userRepository.findUserByEmail(email);
       if (existingUser) {
-        const error = createError.Conflict(
-          "User already exist with this email"
-        );
+        const error = createError.Conflict("User already exist with this email");
         error.details = {
           suggestion: "try login or reset your password.",
           errType: "DUPLICATE_USER",
@@ -58,7 +64,7 @@ export const authServices = {
 
       // Check Existing User In OTP Database
       const existingOtpUser = await OTPRepository.findUserByEmail(email);
-      if (existingOtpUser && existingOtpUser.resendCount >= 4) {
+      if (existingOtpUser && existingOtpUser.resendCount >= 4) {  // user can only send 4 otp per 24 hours
         const error = createError.TooManyRequests("Limit of resend occurs");
         error.details = {
           suggestion: "Try again after 24 hours",
@@ -69,9 +75,7 @@ export const authServices = {
 
       // Hashing Password Securely
       const hashPassword = await argon2.hash(password);
-      const resendOtpCount = existingOtpUser
-        ? existingOtpUser.resendCount + 1
-        : 1;
+      const resendOtpCount = existingOtpUser? existingOtpUser.resendCount + 1: 1;
 
       // OTP Generating and Hashing
       const OtpForUser = generateOtp();
@@ -95,6 +99,10 @@ export const authServices = {
     }
   },
 
+  /**
+   * @function   verifyUserOtp
+   * @desc       Verify otp with otp in database
+   */
   verifyUserOtp: async (email, otp) => {
     try {
       const hashed = hashOtp(otp);
@@ -103,8 +111,6 @@ export const authServices = {
       if (!tempUser) {
         throw createError.NotFound("OTP record not found or expired.");
       }
-      console.log(tempUser);
-
       if (tempUser.hashedOtp !== hashed) {
         throw createError.BadRequest("Invalid or expired OTP.");
       }
@@ -115,6 +121,10 @@ export const authServices = {
     }
   },
 
+  /**
+   * @function  registerUser
+   * @desc      Create user after verifing otp
+   */
   registerUser: async (email) => {
     try {
       const { name, password, createdAt } = await OTPRepository.findUserByEmail(
@@ -136,9 +146,13 @@ export const authServices = {
     }
   },
 
+  /**
+   * @function    loginUser
+   * @desc        Login user
+   */
   loginUser: async (email, password) => {
     try {
-      // basic validation
+      // Basic validation
       if (!isValidEmail(email)) {
         const error = createError.BadRequest("Invalid email");
         error.details = {
@@ -148,6 +162,7 @@ export const authServices = {
         throw error;
       }
 
+      // Fetching user and Validation
       const existingUser = await userRepository.findUserByEmailWithPassword(
         email
       );
@@ -158,14 +173,11 @@ export const authServices = {
           suggestion: "Try reseting your password or try again.",
           errType: "INVALID_CREDINTIALS",
         };
-
         throw error;
       }
 
-      const verifyPassword = await argon2.verify(
-        existingUser.password,
-        password
-      );
+      // Decoding password and validation
+      const verifyPassword = await argon2.verify(existingUser.password,password);
 
       if (!verifyPassword) {
         const error = createError.Unauthorized("Invalid email or password");
@@ -173,10 +185,10 @@ export const authServices = {
           suggestion: "Try reseting your password or try again.",
           errType: "INVALID_CREDINTIALS",
         };
-
         throw error;
       }
 
+      // Generate JWT TOKENS
       const { getAccessToken, getRefreshToken } = tokenCreation(existingUser);
       const accessToken = getAccessToken();
       const refreshToken = getRefreshToken();

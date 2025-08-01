@@ -2,7 +2,6 @@ import connectDB from './config/db.js';
 import app from './app.js';
 import { env } from './config/env.js';
 
-
 connectDB()
   .then(() => {
     app.listen(env.PORT, () => {
@@ -10,6 +9,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error('Failed to connect to the database:', err);
-    process.exit(1);
-  }); 
+    console.error(`Failed to connect to the database: ${err}`);
+  });

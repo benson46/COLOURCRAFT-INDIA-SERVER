@@ -1,7 +1,11 @@
 import OTP from "../model/otpModel.js";
 import createError from "../utils/createError.js";
 
+// Repository for handling all initial register related things in database
 export const OTPRepository = {
+  /**
+   * Find user by email
+   */
   findUserByEmail: async (email) => {
     try {
       return await OTP.findOne({ email });
@@ -10,14 +14,11 @@ export const OTPRepository = {
       throw createError.Internal("Database error while finding user by email.");
     }
   },
-  createTempUser: async ({
-    name,
-    email,
-    password,
-    hashedOtp,
-    resendCount,
-    createdAt,
-  }) => {
+
+  /**
+   * Create a temperory user
+   */
+  createTempUser: async ({name,email,password,hashedOtp,resendCount,createdAt,}) => {
     try {
       const user = await OTP.findOneAndUpdate(
         { email },
@@ -33,6 +34,10 @@ export const OTPRepository = {
       throw createError.Internal("Error while creating or updating temp user.");
     }
   },
+
+  /**
+   * Verify the otp of initial user
+   */
   verifyUserOtpRegistration: async (email) => {
     try {
       return await OTP.findOne({ email }).select("-password");
@@ -44,6 +49,10 @@ export const OTPRepository = {
       throw createError.Internal("Database error during OTP verification.");
     }
   },
+
+  /**
+   * Delete the verified user
+   */
   deleteVerifieduser: async (email) => {
     try {
       return await OTP.deleteOne({ email });

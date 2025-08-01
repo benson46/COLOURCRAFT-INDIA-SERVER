@@ -1,7 +1,11 @@
 import User from "../model/userModel.js";
 import createError from "../utils/createError.js";
 
+// Repository for handling user database
 export const userRepository = {
+  /**
+   * Find user by id
+   */
   findUserById: async (id) => {
     try {
       return await User.findById(id).select("-password");
@@ -10,6 +14,10 @@ export const userRepository = {
       throw createError.Internal("Database error while finding user by email.");
     }
   },
+
+  /**
+   * Find user by email(-password)
+   */
   findUserByEmail: async (email) => {
     try {
       return await User.findOne({ email }).select("-password");
@@ -18,6 +26,10 @@ export const userRepository = {
       throw createError.Internal("Database error while finding user by email.");
     }
   },
+
+  /**
+   * Find user by email (+password)
+   */
   findUserByEmailWithPassword: async (email) => {
     try {
       return await User.findOne({ email }).select("+password");
@@ -26,6 +38,10 @@ export const userRepository = {
       throw createError.Internal("Database error while finding user by email");
     }
   },
+
+  /**
+   * Create the new user 
+   */
   createUser: async (name, email, password, createdAt) => {
     try {
       return await  User.create({ name, email, password, createdAt });
@@ -34,6 +50,10 @@ export const userRepository = {
       throw createError.Internal("Database error while creating new user");
     }
   },
+
+  /**
+   * Find admin with email
+   */
   findAdminWithEmail: async (email) => {
     try {
       const admin = await User.findOne({ email });
@@ -56,6 +76,10 @@ export const userRepository = {
       throw createError.Internal("Error while fetching admin");
     }
   },
+
+  /**
+   * Find admin with id
+   */
   findAdminWithId:async(_id)=>{
     try {
      const admin =  await User.findById(_id).select("-password")
@@ -67,6 +91,10 @@ export const userRepository = {
       throw createError.Internal("Error while fetching admin userRepository: ",error)
     }
   },
+
+  /**
+   * Find all users for admin only
+   */
   findAllUserForAdmin: async () => {
     try {
       return await User.find().select("-password");
