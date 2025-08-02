@@ -31,6 +31,19 @@ export const OTPRepository = {
     }
   },
 
+  // Update the OTP
+  updateOTP: async(email,hashedOtp,resendCount)=>{
+    try {
+      await OTP.findOneAndUpdate(
+        {email},
+        {$set:{hashedOtp,resendCount}},
+      )
+      return true
+    } catch (error) {
+      throw createError.Internal("Databse Error while updating new OTP")
+    }
+  },
+  
   // Verify the otp of initial user
   verifyUserOtpRegistration: async (email) => {
     try {

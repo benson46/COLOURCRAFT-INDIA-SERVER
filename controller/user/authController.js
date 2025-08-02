@@ -64,6 +64,18 @@ export const authController = {
     }
   },
 
+  /** Resend OTP
+   *  @desc  Resend OTP 
+   */
+  resendOtp: async (req,res,next) =>{
+    try {
+      const {email} = req.body;
+      await authServices.resendUserOtp(email);
+      return res.status(201).json({success:true,message:"Resend OTP successful"})
+    } catch (error) {
+      next(error)
+    }
+  },
   
   /** Login User
    * @desc    Logs in the user and sets HTTP-Only access/refresh tokens

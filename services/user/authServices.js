@@ -65,7 +65,7 @@ export const authServices = {
       const existingOtpUser = await OTPRepository.findUserByEmail(email);
       if (existingOtpUser && existingOtpUser.resendCount >= 4) {
         // user can only send 4 otp per 24 hours
-        const error = createError.TooManyRequests("Limit of resend occurs");
+        const error = createError.TooManyRequests("Limit of resend OTP occured");
         error.details = {
           suggestion: "Try again after 24 hours",
           errType: "LIMIT_RESEND_OTP",
@@ -117,6 +117,36 @@ export const authServices = {
       return true;
     } catch (error) {
       throw error;
+    }
+  },
+
+  // Resend otp 
+  resendUserOtp : async(email) =>{
+    try {
+      const existingOtpUser = await OTPRepository.findUserByEmail(email);
+       if (existingOtpUser && existingOtpUser.resendCount >= 4) {
+          // user can only send 4 otp per 24 hours
+          const error = createError.TooManyRequests("Limit of resend occurs");
+          error.details = {
+            suggestion: "Try again after 24 hours",
+            errType: "LIMIT_RESEND_OTP",
+          };
+          throw error;
+        }
+  
+        const resendOtpCount = existingOtpUser
+          ? existingOtpUser.resendCount + 1
+          : 1;
+  
+        // OTP Generating and Hashing
+        const OtpForUser = generateOtp();
+        const hashedOtp = hashOtp(OtpForUser);
+  
+        await OTPRepository.updateOTP(email,hashedOtp,resendOtpCount)
+
+        await sendOtpMail(email,OtpForUser)
+    } catch (error) {
+      throw error
     }
   },
 

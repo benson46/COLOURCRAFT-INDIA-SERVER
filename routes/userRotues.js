@@ -4,6 +4,7 @@
 import express from "express";
 
 import { authController } from "../controller/user/authController.js";
+import { userProductController } from "../controller/user/userProductController.js";
 
 const router = express.Router();
 
@@ -23,6 +24,11 @@ router.post("/initiate-register", authController.initiateRegister);
  */
 router.post("/verify-otp", authController.verifyOtp);
 
+/**
+ * @route   POST /api/user/resend-otp
+ * @desc    Resend OTP
+ */
+router.post("/resend-otp", authController.resendOtp);
 
 /**
  * @route   POST /api/user/login
@@ -32,8 +38,8 @@ router.post("/login", authController.login);
 
 
 // ============================================================================
-// USER AUTH ROUTES
+// USER PRODUCT ROUTES
 // ============================================================================
 
-
+router.get('/products',userProductController.fetchingProducts)
 export default router;
