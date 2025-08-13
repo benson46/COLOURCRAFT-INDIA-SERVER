@@ -1,6 +1,7 @@
 import Product from "../model/productModel.js";
 import createError from "../utils/createError.js";
 
+
 export const productRepository = {
   // Find product by title
   findByTitle: async (title) => {
@@ -43,10 +44,17 @@ export const productRepository = {
     }
   },
 
-  // Find all Products 
-  findAllProducts: async () => {
+  // Find all Products
+  findAllProducts: async (query = {}, sort = {}, skip = 0, limit = 10) => {
     try {
-      return await Product.find().populate('category');
+      const products = await Product.find(query)
+        .populate("category")
+        .sort(sort)
+        .skip(skip)
+        .limit(limit);
+
+      const totalCount = await Product.countDocuments(query);
+      return {products,totalCount}
     } catch (error) {
       throw createError.Internal("Database error while fetching products");
     }
@@ -60,7 +68,7 @@ export const productRepository = {
         product._id,
         { $set: { isBlocked: !product.isBlocked } },
         { new: true }
-      )
+      );
       if (!updatedProduct) {
         throw createError.NotFound("Product not found");
       }
@@ -72,16 +80,16 @@ export const productRepository = {
     }
   },
 
-  // Edit product 
+  // Edit product
   updateProduct: async (id, updateData) => {
-  try {
-    return await Product.findByIdAndUpdate(
-      id,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    ).populate('category');
-  } catch (error) {
-    throw error;
-  }
-}
+    try {
+      return await Product.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      ).populate("category");
+    } catch (error) {
+      throw error;
+    }
+  },
 };

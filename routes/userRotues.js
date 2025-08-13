@@ -5,6 +5,7 @@ import express from "express";
 
 import { authController } from "../controller/user/authController.js";
 import { userProductController } from "../controller/user/userProductController.js";
+import { userCategoryController } from "../controller/user/userCategoryController.js";
 
 const router = express.Router();
 
@@ -42,4 +43,12 @@ router.post("/login", authController.login);
 // ============================================================================
 
 router.get('/products',userProductController.fetchingProducts)
+router.get('/product/:id', userProductController.fetchingProductById);
+
+
+// ============================================================================
+// USER CATEGORY ROUTES
+// ============================================================================
+router.get('/categories', userCategoryController.fetchingCategories);
+
 export default router;
