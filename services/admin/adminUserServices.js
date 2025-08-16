@@ -8,11 +8,31 @@ import { isValidEmail } from "../../utils/validators.js";
  */
 export const adminUserServices = {
   // Fetch all users
-  findAllUser: async () => {
+  findAllUser: async (queryParams) => {
     try {
-      const users = await userRepository.findAllUserForAdmin();
-      return users;
-    } catch (error) {}
+      const { search, status, page, limit } = queryParams;
+      const result = await userRepository.findAllUsersForAdmin({
+        search,
+        status,
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 10,
+      });
+
+      // Get counts
+      const activeCount = await userRepository.countUsers({ status: "Active" });
+      const blockedCount = await userRepository.countUsers({
+        status: "Blocked",
+      });
+
+      return {
+        ...result,
+        activeCount,
+        blockedCount,
+      };
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw createError.Internal("Database error while fetching users");
+    }
   },
 
   // Toogle user status block/unblock

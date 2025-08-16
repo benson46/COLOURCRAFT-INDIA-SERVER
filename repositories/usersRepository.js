@@ -84,13 +84,58 @@ export const userRepository = {
     }
   },
 
-  // Find all users (admin only)
-  findAllUserForAdmin: async () => {
-    try {
-      return await User.find().select("-password");
-    } catch (error) {
-      console.error("Error while fetching all users userRepository : ", error);
-      throw createError.Internal("Error while fetching users");
+countUsers: async (filters = {}) => {
+  try {
+    return await User.countDocuments(filters);
+  } catch (error) {
+    console.error("Error counting users: ", error);
+    throw createError.Internal("Error while counting users");
+  }
+},
+
+// Update this method
+findAllUsersForAdmin: async (filters = {}) => {
+  try {
+    const { search, status, page = 1, limit = 10 } = filters;
+
+    // Build query object
+    const query = {};
+
+    // Status filter
+    if (status && status !== "All") {
+      query.status = status;
     }
-  },
+
+    // Search filter
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } } // Make phone search case-insensitive too
+      ];
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Execute query
+    const users = await User.find(query)
+      .select("-password")
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Get total count
+    const total = await User.countDocuments(query);
+
+    return {
+      users,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: parseInt(page),
+    };
+  } catch (error) {
+    console.error("Error while fetching users: ", error);
+    throw createError.Internal("Error while fetching users");
+  }
+},
 };

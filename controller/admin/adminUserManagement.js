@@ -12,11 +12,25 @@ export const adminUserMangement = {
    */
   fetchUsers: async (req, res, next) => {
     try {
-      const users = await adminUserServices.findAllUser();
+      const { search, status, page, limit } = req.query;
+      const result = await adminUserServices.findAllUser({
+        search,
+        status,
+        page,
+        limit,
+      });
+
+      console.log("Fetched users:", result);
+
       return res.status(200).json({
         success: true,
         message: "Fetched users successfully",
-        users,
+        users: result.users,
+        total: result.total,
+        totalPages: result.totalPages,
+        currentPage: result.currentPage,
+        activeCount: result.activeCount, 
+        blockedCount: result.blockedCount,
       });
     } catch (error) {
       next(error);
