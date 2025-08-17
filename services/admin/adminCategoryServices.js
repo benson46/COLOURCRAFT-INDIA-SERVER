@@ -8,13 +8,13 @@ import { isValidTitle } from "../../utils/validators.js";
  */
 export const adminCategoryServices = {
 //  Fetch all categories
-  getAllCategory: async () => {
-    try {
-      return await categoryRepository.findAllCategory();
-    } catch (error) {
-      throw error;
-    }
-  },
+  getAllCategory: async (search, page, limit) => {
+  try {
+    return await categoryRepository.findAllCategory(search, page, limit);
+  } catch (error) {
+    throw error;
+  }
+},
 
   // Add new category
   addNewCategory: async (title, status) => {

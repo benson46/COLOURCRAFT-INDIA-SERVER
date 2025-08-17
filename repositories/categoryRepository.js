@@ -27,15 +27,39 @@ export const categoryRepository = {
   },
 
   // Fetch all categories
-  findAllCategory: async () => {
-    try {
-      return await Category.find();
-    } catch (error) {
-      throw createError.Internal(
-        "Database error occurred while fetching all categories"
-      );
-    }
-  },
+findAllCategory: async (search, page = 1, limit = 10) => {
+  try {
+    const query = search ? { title: { $regex: search, $options: "i" } } : {};
+    
+    // Get total count
+    const totalCategories = await Category.countDocuments(query);
+    const totalPages = Math.ceil(totalCategories / limit);
+    
+    // Calculate skip value
+    const skip = (page - 1) * limit;
+    
+    const activeCount = await Category.countDocuments({ status: "Active" });
+    const inactiveCount = await Category.countDocuments({ status: "Inactive" });
+    
+    // Fetch paginated results
+    const categories = await Category.find(query)
+      .skip(skip)
+      .limit(limit);
+    
+    return {
+      categories,
+      totalCategories,
+      totalPages,
+      currentPage: parseInt(page),
+      activeCount,
+      inactiveCount,
+    };
+  } catch (error) {
+    throw createError.Internal(
+      "Database error occurred while fetching all categories"
+    );
+  }
+},
 
   // Update the status of a category
   updateStatus: async (_id, status) => {

@@ -24,7 +24,7 @@ export const adminCategoryController = {
       return res.status(201).json({
         success: true,
         message: "New category created successfully",
-        newCategory,
+        category:newCategory,
       });
     } catch (error) {
       next(error);
@@ -36,17 +36,23 @@ export const adminCategoryController = {
    * @desc    Get all categories
    */
   fetchingAllCategory: async (req, res, next) => {
-    try {
-      const categories = await adminCategoryServices.getAllCategory();
-      return res.status(200).json({
-        success: true,
-        message: "Fetched all categories successfully",
-        categories,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+  try {
+    const { search, page = 1, limit = 10 } = req.query;
+    const result = await adminCategoryServices.getAllCategory(search, page, limit);
+    return res.status(200).json({
+      success: true,
+      message: "Fetched all categories successfully",
+      categories: result.categories,
+      totalCategories: result.totalCategories,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+      activeCount: result.activeCount,
+      inactiveCount: result.inactiveCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+},
 
   /**
    * @function tooglingCategory
