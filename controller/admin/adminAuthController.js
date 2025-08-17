@@ -44,4 +44,19 @@ export const adminAuthController = {
       next(error);
     }
   },
+
+  logout: async (req, res, next) => {
+    try {
+      // Clear cookies
+      res.clearCookie("adminAccessToken");
+      res.clearCookie("adminRefreshToken");
+
+      return res.status(200).json({
+        success: true,
+        message: "Admin logged out successfully",
+      });
+    } catch (error) {
+      next(error)
+    }
+  },
 };

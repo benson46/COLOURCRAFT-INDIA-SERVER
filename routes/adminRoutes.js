@@ -25,6 +25,14 @@ const router = express.Router();
 router.post("/login", adminAuthController.login);
 
 
+/**
+ * @route   POST /api/admin/logout
+ * @desc    Admin logout
+ */
+router.post("/logout", adminAuthController.logout);
+
+
+
 // ============================================================================
 // ADMIN USER MANAGEMENT
 // ============================================================================
